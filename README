@@ -1,0 +1,14 @@
+Next steps:
+  mkdir test
+  cd test
+  git init
+  touch README
+  git add README
+  git commit -m 'first commit'
+  git remote add origin git@github.com:mfylee/test.git
+  git push -u origin master
+      
+Existing Git Repo?
+  cd existing_git_repo
+  git remote add origin git@github.com:mfylee/test.git
+  git push -u origin master
