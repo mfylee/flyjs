@@ -1,125 +1,136 @@
 /**
- * flyjs Model
+ * 模型层
+ * @author lifayu@meifuzhi.com
+ * @date 2012-3-9
+ * @version 1.0
  */
-(function(flyjs){
-	flyjs.Model.Base = {
-        __error:0,
-        //初始化方法，默认调用
-		init:function(){},
-        //模型数据维护
-		attributes:{},
-        /**
-         * 设置或获取属性
-         * @param {String} arguments[0]         属性名称
-         * @param {String|Object} arguments[1]  如果存在，则为设置属性
-         */
-		attr:function(){
-			var me = this;
-			if(arguments.length > 1){
-				var old = me.attributes[arguments[0]];
-				if(old != arguments[1]){
-					me.attributes[arguments[0]] = arguments[1];
-					me.dispatchEvent("onchange");
+(function() {
+	window.flyjs = flyjs || {};
+	flyjs.Model = flyjs.Model = {};
+	/**
+	 * 构造Model实体
+	 * @example
+	 * 	var Model = flyjs.Model.createClass(function(){
+	 *		//constructor
+	 *		this.name = "";
+	 *		this.age = "2";
+	 *	},{
+	 *		//protect
+	 *		getAge:function(){
+	 *			return this.age;
+	 *		}
+	 *	}).extend({
+	 *		//public
+	 *		setName:function(name){
+	 *			this.name = name;
+	 *		},
+	 *		getName:function(){
+	 *			return this.name;
+	 *		}
+	 *	});
+	 */
+	flyjs.extend(flyjs.Model, {
+		_base : {
+			//初始化方法，默认调用
+			_init : function() {
+			},
+			/**
+			 * 设置或获取属性，类似java的getter/setter
+			 * @param {String} a         属性名称
+			 * @param {String|Object} b  如果存在，则为设置属性
+			 */
+			attr : function(a, b) {
+				var me = this;
+
+				var old = me[a];
+				if(arguments.length > 1) {
+					if(old != b) {
+						me[a] = b;
+						me.dispatchEvent("onchange", a, old, b);
+					}
+				} else {
+					return old;
 				}
-			}else{
-				return me.attributes[arguments[0]];
+			},
+			/**
+			 * 判断属性是否存在
+			 * @param {String} attr 属性名称
+			 */
+			has : function(attr) {
+				return typeof this[attr] != "undefined";
+			},
+			/**
+			 * 获取数据
+			 * 使用get方式
+			 * @param {String} url          请求地址
+			 * @param {Object} opts         请求配置信息（data，success，error等）
+			 * @param {Function} callback   回调函数，用于Model获取返回结果
+			 */
+			fetch : function(url, opts, callback) {
+				var me = this;
+				function realFun(opts) {
+					var fun = opts.success;
+					return function(json) {
+						if( typeof callback == "function") {
+							callback.call(me, json);
+						}
+						fun.call(this, json);
+					}
+				}
+
+
+				opts.success = realFun(opts);
+				flyjs.get(url, opts);
+			},
+			/**
+			 * 保存数据
+			 * 使用POST方式，参数参考flyjs.Base
+			 */
+			save : function(url, opts) {
+				var me = this;
+				var opts = flyjs.extend({
+					//这里是默认配置
+				}, opts);
+				function realFun(opts) {
+					var fun = opts.success;
+					return function(json) {
+						//flyjs.extend(me.attributes, opts.data);
+						fun.call(this, json);
+					}
+				}
+
+
+				opts.success = realFun(opts);
+				flyjs.post(url, opts);
+			},
+			/**
+			 * 修改属性时触发
+			 * @param {String}attr		change的字段
+			 * @param {Object}oldValue	旧值
+			 * @param {Object}newValue	新值
+			 */
+			onchange : function(attr, oldValue, newValue) {
+			},
+			dispose : function() {
+				delete window["$FLYJS$"]._instances[this.guid];
 			}
 		},
-        /**
-         * 获取数据
-         * 使用get方式
-         */
-        fetch:function(url,opts){
-            flyjs.get(url,opts);
-        },
-        /**
-         * 保存数据
-         * 使用POST方式，参数参考flyjs.Base
-         */
-        save:function(url,opts){
-            var me = this;
-            var opts= flyjs.extend({
-                //这里是默认配置
-                validError:function(){}
-            },opts);
-            if(me.validator(opts.data,opts)){
-                function realFun(opts){
-                    var fun = opts.success;
-                    return function(json){
-                        flyjs.extend(me.attributes,opts.data);
-                        fun.call(this,json);
-                    }
-                }
-                opts.success = realFun(opts);
-                flyjs.post(url,opts);
-            }else{
-                opts.validError(me);
-            }
-        },
-        /**
-         * 判断属性是否存在
-         * @param {String} attr 属性名称
-         */
-        has:function(attr){
-            return typeof this.attributes[attr] != "undefined";
-        },
-        rules:{},
-        validator:function(data,opts){
-            var me = this;
-            me.__error = 0;
-            flyjs.each(data,function(value,key){
-                if(typeof me.rules[key] == "function"){
-                    if(!me.rules[key].call(me,value,data)){
-                        me.__error++;
-                        //TODO 共享message
-                        opts.validError(me,key);
-                    }
-                }
-            });
-            return me.__error == 0;
-        },
-		onchange:function(){},
-		dispatchEvent:function(evt){
+		/**
+		 * 创建构造函数
+		 * @param {Function} constructor	构造函数
+		 * @param {Object} attr				原型方法,默认属性
+		 * @return Function(Class)
+		 */
+		createClass : function(constructor, attr) {
 			var me = this;
-			if(evt && me[evt]){
-				return me[evt].apply(me,Array.prototype.slice.call(arguments,1));
-			}
+			var attr = attr || {};
+			var opts = flyjs.extend({}, me._base, attr);
+
+			return flyjs.createClass(constructor, opts);
 		},
-		ondispose:function(){
-			delete window["$FLYJS$"]._instances[this.guid];
+		extend : function(opts) {
+			return new (flyjs.Model.createClass(function(){},opts))();
 		}
-	};
-	flyjs.Model.createClass = function(constructor,opts){
-		var opts = opts || {};
-		var superClass = opts.superClass || function(){};
-		//真正的构造函数
-		var mod = function(opt){
-			var me = this;
-			opt = opt || {};
-			superClass.call(me,(opt.guid || ""));
-			constructor.apply(me);
-			flyjs.extend(me,opts,opt);
-			me.init();
-		};
-		C = function(){};
-		C.prototype = superClass.prototype;
-		var fp = mod.prototype = new C();
-		for(var i in flyjs.Model.Base){
-			fp[i] = flyjs.Model.Base[i];
-		}
-		mod.extend = function(json){
-			for(var i in json){
-				mod.prototype[i] = json[i];
-			}
-			return mod;
-		};
-		return mod;
-	};
-	flyjs.Model.extend = function(){
-		if(arguments.length > 1){
-			return flyjs.extend(true,{},arguments[0],arguments[1]);
-		}else{
-			return new (flyjs.Model.createClass(function(){},arguments[0]))();
-		}
-	};
-})(flyjs);
+	});
+
+})(); 
