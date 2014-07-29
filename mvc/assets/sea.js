@@ -1497,10 +1497,12 @@ seajs.config({
 	comboExcludes: /jquery\.js/, // 从 combo 中排除掉 jquery.js 
 	alias: {
 		"jquery":"dep/jquery/jquery",
+		"flyjs":"libs/fly",
         "echarts":"dep/echarts/echarts"
 	},
 	map:[
         ["dep/", "../dep/"],
+        ["libs/", "../libs/"],
         ["dist", "src"]
 	],
 	preload: [
