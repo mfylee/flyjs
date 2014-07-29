@@ -1,0 +1,32 @@
+{
+  "family": "#",
+  "name": "test",
+  "version": "1.0.0",
+  "description": "test",
+  "homepage": "https://github.com/lifayu/test",
+  "author": "lifayu@baidu.com",
+  "maintainers": [
+    "lifayu@baidu.com"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lifayu/test.git"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [],
+  "licenses": "MIT",
+  "spm": {
+    "output": [
+      "common/main.js",
+      "action.js",
+      "alarm/action.js"
+    ],
+    "alias": {
+        "jquery":"dep/jquery/jquery"
+    },
+    "devAlias": {},
+    "engines": {}
+  }
+}

@@ -1,0 +1,1 @@
+define("#/test/1.0.0/alarm/action",["./view","./model"],function(a,b){var c=a("./view"),d=a("./model");b.init=function(){c.init(),d.init()}}),define("#/test/1.0.0/alarm/view",[],function(a,b){b.init=function(){console.log("view")}}),define("#/test/1.0.0/alarm/model",[],function(a,b){b.init=function(){console.log("model")}});
