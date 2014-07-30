@@ -4,4 +4,7 @@ define(function(require, exports, module){
         console.log('view');
     }
 
+    exports.dispose = function(){
+
+    };
 });

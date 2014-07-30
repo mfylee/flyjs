@@ -8,6 +8,7 @@ define(function(require, exports, module){
     var $ = require("jquery");
 
     var fly = require("flyjs");
+    var uri = require("uri");
 
     var $main;
 
@@ -26,20 +27,17 @@ define(function(require, exports, module){
             history.addRouter(new RegExp(".+?"), function(fragment){
                 var arr = fragment.split("~");
                 var action = arr[0].substring(2);
-                console.log(action);
-                if(arr.length > 1){
-                    var paramArray = arr[1].split("&");
-                    
-                }
-                me.router(action);
+                var params = uri.parseQuery(arr[1]);
+                me.router(action, params);
             });
             history.start();
         },
-        router:function(action){
+        router:function(action, params){
             curAction && curAction.dispose();
             require.async(controller[action], function(alarm){
                 curAction = alarm;
                 alarm.init({
+                    params:params,
                     root:$main
                 });
             });

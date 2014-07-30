@@ -12,7 +12,7 @@ define(function(require, exports, module){
             view.init();
             model.init();
             
-            options.root.html("I'm at Home");
+            options.root.html("I'm at Home" + JSON.stringify(options.params));
 			console.log(fly);
         },
         dispose:function(){

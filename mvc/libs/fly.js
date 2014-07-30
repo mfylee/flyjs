@@ -1,5 +1,9 @@
-
-
+/**
+ * mvc基础框架
+ * @author lifayu@baidu.com
+ * @since 2014-07-30
+ * @version v2.0.0
+ */
 define(function(require, exports, module){
 
     var jQuery = $ = require("jquery");
@@ -7,7 +11,9 @@ define(function(require, exports, module){
     window["$FLYJS$"] = {};
     //用于存储对象实例
     window["$FLYJS$"]._instances = {};
-    var flyjs = {};
+    var flyjs = {
+        version: "2.0.0"
+    };
 
     flyjs.Class = {};
     //视图层
@@ -262,7 +268,7 @@ define(function(require, exports, module){
         /**
          * ajax提交方法
          * @date 2011年6月13日 21:46:16
-         * @author lifayu@meifuzhi.com
+         * @author lifayu@baidu.com
          * @config {String} url
          * @config {Object} data
          * @config {String} dataType == json
@@ -361,7 +367,7 @@ define(function(require, exports, module){
     })();
     /**
      * 模型层
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */
@@ -495,7 +501,7 @@ define(function(require, exports, module){
     })();
     /**
      * 视图层
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */
@@ -562,12 +568,17 @@ define(function(require, exports, module){
 
                     if(events) {
                         for(var key in events) {
-                            var method = me[events[key]];
-                            if(!method)
-                                throw new Error('Event "' + events[key] + '" does not exist');
+                            var method = events[key];
                             var match = key.match(/^(\S+)\s*(.*)$/);
                             var eventName = match[1], selector = match[2];
-                            flyjs.live(selector, eventName, realListener(method), me.el);
+                            if(typeof method == "function"){
+                                flyjs.live(selector, eventName, realListener(method), me.el);
+                            }else {
+                                method = me[events[key]];
+                                if(!method)
+                                    throw new Error('Event "' + events[key] + '" does not exist');
+                                flyjs.live(selector, eventName, realListener(method), me.el);
+                            }
                         }
                     }
                 }
@@ -594,7 +605,7 @@ define(function(require, exports, module){
     /**
      * 模块管理
      * @require Template.js
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */
@@ -656,7 +667,7 @@ define(function(require, exports, module){
                 if( typeof mod.text != "undefined" && isCache) {
                     callback(mod.text);
                 } else {
-                    flyjs.ajax(m.extend({
+                    flyjs.ajax(flyjs.extend({
                         url : mod.path,
                         type : "GET",
                         success : function(htm) {
@@ -713,7 +724,7 @@ define(function(require, exports, module){
     })();
     /**
      * javascript模版引擎
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */
@@ -882,7 +893,7 @@ define(function(require, exports, module){
     })();
     /**
      * 历史管理
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */
@@ -1000,7 +1011,7 @@ define(function(require, exports, module){
 
     /**
      * Router 路由管理
-     * @author lifayu@meifuzhi.com
+     * @author lifayu@baidu.com
      * @date 2012-3-9
      * @version 1.0
      */

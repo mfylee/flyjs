@@ -1491,13 +1491,15 @@ seajs._config = {
  * seajs配置信息
  * @author lifayu@meifuzhi.com
  */
-var seajsBase = "../dist/";
+//var seajsBase = "../dist/";
+var seajsBase = "../src/";
 seajs.config({
 	//comboSyntax:["?f=","&f="],
 	comboExcludes: /jquery\.js/, // 从 combo 中排除掉 jquery.js 
 	alias: {
 		"jquery":"dep/jquery/jquery",
 		"flyjs":"libs/fly",
+        "uri":"libs/uri",
         "echarts":"dep/echarts/echarts"
 	},
 	map:[
